@@ -1,4 +1,4 @@
-# My Python repo
+# Processing historical emissions for CMIP7 harmonization routines
 <!--- Adding a one-line description of what this repository is for here may be
 helpful -->
 <!---
@@ -17,6 +17,9 @@ on your repository where you're up to. Some suggested options:
 
 -->
 
+Scripts that combine historical emissions data records from several datasets like CEDS and GFED to create complete historical emissions files that are input to the IAM emissions harmonization algorithms in `IAMconsortium/concordia` (regional harmonization and spatial gridding for ESMs) and `iiasa/climate-assessment` (global climate emulator workflow).
+
+
 ## Status
 
 - prototype: the project is just starting up and the code is all prototype
@@ -28,6 +31,8 @@ We do all our environment management using
 sure that poetry is installed
 ([instructions here](https://python-poetry.org/docs/#installing-with-the-official-installer),
 we found that pipx and pip worked better to install on a Mac).
+
+You may need to upgrade `poetry` if errors occur, as was the case e.g., [here](https://github.com/iiasa/emissions_harmonization_historical/issues/2).
 
 To create the virtual environment, run
 
@@ -73,27 +78,20 @@ it all in the README is fine. -->
 Install and run instructions are the same as the above (this is a simple
 repository, without tests etc. so there are no development-only dependencies).
 
-### Contributing
 
-This is a very thin repository. There aren't any strict guidelines for
-contributing, partly because we don't know what we're trying to achieve (we're
-just exploring). If you would like to contribute, it is best to raise an issue
-to discuss what you want to do (without a discussion, we can't guarantee that
-any contribution can actually be used).
-<!--- You may want to update this section as the project evolves. -->
 
 ### Repository structure
 
-The repository is very basic. It imposes no structure on you so you can layout
-your Python files, notebooks etc. in any way you wish. We do have a basic
-`Makefile` which captures key commands in one place (for more thoughts on why
-this makes sense, see
-[general principles: automation](https://gitlab.com/znicholls/mullet-rse/-/blob/main/book/general-principles/automation.md)).
-For an introduction to `make`, see
-[this introduction from Software Carpentry](https://swcarpentry.github.io/make-novice/).
-Having said this, if you're not interested in `make`, you can just copy the
-commands out of the `Makefile` by hand and you will be 90% as happy for a
-simple repository like this.
+General functions in `emissions_harmonization_historical`.
+
+Data: big files, locally, in `data`, especially under the `data_raw` subfolders.
+  Structured in `national` (e.g., CEDS, GFED) and `global` (e.g., GCB) folders.
+
+
+Notebooks: these are the main processing scripts.
+  `01**`: preparing input data for `IAMconsortium/concordia`.
+  `02**`: preparing input data for `iiasa/climate-assessment`.
+
 
 ### Tools
 
@@ -124,10 +122,3 @@ In this repository, we use the following tools:
     (for more thoughts on the usefulness of Jupytext, see
     [tips and tricks: Jupytext](https://gitlab.com/znicholls/mullet-rse/-/blob/main/book/tips-and-tricks/managing-notebooks-jupytext.md))
         - this avoids nasty merge conflicts and incomprehensible diffs
-
-## Original template
-
-This project was generated from this template:
-[basic python repository](https://gitlab.com/znicholls/copier-basic-python-repository).
-[copier](https://copier.readthedocs.io/en/stable/) is used to manage and
-distribute this template.
