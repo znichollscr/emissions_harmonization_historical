@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pandas as pd
+import pandas_indexing as pix
 
 
 def get_map(mapping, sector_column, sector_output_column_name="sector_59"):
@@ -69,3 +70,30 @@ def read_CEDS(path: Path, num_index=4, sector_output_column_name="sector_59"):
         .rename_axis(index={"country": "region", "sector": sector_output_column_name})
     )
     return df
+
+
+def add_global(df, groups=["em", "unit", "sector"]):
+    """
+    Add a "global" (worldwide) aggregation to the DataFrame by summing emissions data across all countries.
+
+    Parameters
+    ----------
+        df (pandas.DataFrame): A pandas DataFrame containing emissions data, with at least the following columns:
+            - "em": The emission type (e.g., CO2, CH4, etc.).
+            - "unit": The unit of measurement for the emissions (e.g., "kg", "tonnes").
+            - "sector": The sector of emissions (e.g., energy, agriculture, etc.).
+            - Additional columns (e.g., "country") represent different dimensions of the data.
+
+    Returns
+    -------
+        pandas.DataFrame: A DataFrame that includes:
+            - The original data for individual countries.
+            - An additional row (or rows) where the "country" is labeled as "World", representing
+              the global sum of emissions for each unique combination of emission type, unit, and sector.
+
+    Workflow:
+        - Group the DataFrame by "em", "unit", and "sector" (or any other setting to 'groups'), then sum.
+        - Assign the label "World" to the "country" column for these aggregated rows.
+        - Concatenate the original DataFrame with the new "World" rows.
+    """
+    return pix.concat([df, df.groupby(groups).sum().pix.assign(country="World")])

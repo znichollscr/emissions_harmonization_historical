@@ -24,7 +24,7 @@ import os
 import sys
 repo_root = os.path.abspath(os.path.join(os.getcwd(), '..')) # the notebook is in a 'notebooks' folder, so we want to go up one level to the root
 sys.path.append(repo_root) # Append the repository root to sys.path
-from emissions_harmonization_historical.ceds import get_map, read_CEDS
+from emissions_harmonization_historical.ceds import get_map, read_CEDS, add_global
 
 # set unit registry
 ur = pix.units.set_openscm_registry_as_default()
@@ -36,7 +36,21 @@ ur = pix.units.set_openscm_registry_as_default()
 ceds_release = "2024_07_08"
 ceds_data_folder = Path("..", "data", "national", "ceds", "data_raw")
 ceds_sector_mapping_file = Path("..", "data", "national", "ceds", "data_aux", "sector_mapping.xlsx")
-ceds_processed_output_file = Path("..", "data", "national", "ceds", "processed", "ceds_cmip7_alpha.csv")
+ceds_processed_output_file = Path("..", "data", "national", "ceds", "processed", "ceds_cmip7_national_alpha.csv")
+
+# Specify gases to processes
+
+# use all gases covered in CEDS
+gases = ["BC",
+         "CH4",
+         "CO",
+         "CO2",
+         "N2O", # new, to have regional, was global in CMIP6
+         "NH3",
+         "NMVOC", # assumed to be equivalent to IAMC-style reported VOC
+         "NOx",
+         "OC",
+         "SO2"]
 
 # Load sector mapping of emissions species
 
@@ -46,16 +60,6 @@ ceds_map.to_frame(index=False)
 
 # Read CEDS emissions data
 
-gases = ["BC",
-         "CH4",
-         "CO",
-         "CO2",
-         "N2O", # new, not in CMIP6
-         "NH3",
-         "NMVOC", # assumed to be equivalent to IAMC-style reported VOC
-         "NOx",
-         "OC",
-         "SO2"]
 ceds = pd.concat(
     read_CEDS(
         Path(ceds_data_folder)
@@ -72,14 +76,14 @@ ceds = pix.units.convert_unit(ceds, lambda x: "Mt " + x.removeprefix("kt").strip
 
 ceds = ceds.groupby(["em", "country", "unit", "sector"]).sum().pix.fixna() # group and fix NAs
 
+# aggregate countries where this is necessary, e.g. because of specific other data (like SSP socioeconomic driver data)
+# TODO: check this based on the new SSP data (because old SSP data only had the sum); so recheck.
 country_combinations = {"isr_pse": ["isr", "pse"],
                         "sdn_ssd": ["ssd", "sdn"],
-                        "srb_ksv": ["srb", "srb (kosovo)"]} # NB should add kosovo and ssd ; check this based on the new SSP data (because old SSP data only had the sum); so recheck.
+                        "srb_ksv": ["srb", "srb (kosovo)"]}
 ceds = ceds.pix.aggregate(country=country_combinations)
 
-
-def add_global(df):
-    return pix.concat([df, df.groupby(["em", "unit", "sector"]).sum().pix.assign(country="World")])
+# add global
 ceds = add_global(ceds)
 
 unit_wishes = pd.MultiIndex.from_tuples(
@@ -97,14 +101,25 @@ unit_wishes = pd.MultiIndex.from_tuples(
     names=["em", "unit"],
 )
 
+ceds.pix.unique(unit_wishes.names)
+
 ceds.pix.unique(unit_wishes.names).symmetric_difference(unit_wishes)
 
 # Save formatted CEDS data
 
-(
+# +
+# reformat
+ceds_ref = (
     ceds
     .droplevel("unit")
     .pix.semijoin(unit_wishes, how="left")
     .rename_axis(index={"em": "gas"})
+)
+
+
+# -
+
+(
+    ceds_ref
     .to_csv(ceds_processed_output_file)
 )
