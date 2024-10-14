@@ -1,7 +1,7 @@
 Download all data from source:
 https://www.geo.vu.nl/~gwerf/GFED/GFED4/
 
-Latest access: 10.10.2024
+Last accessed: 10.10.2024
 
 We use the following files:
 

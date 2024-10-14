@@ -69,6 +69,19 @@ poetry run jupyter lab
 perhaps replacing the other instructions above as they may become redundant.
 -->
 
+## Data
+
+### Input data
+Note that this repository focuses on processing data, and does not currently also (re)host input data files.
+
+Files that need to be downloaded to make sure you can run the notebooks are specified in the relevant `data` subfolders, in README files, such as in `\data\national\ceds\data_raw\README.txt` for the CEDS data download, and in `\data\national\gfed\data_raw\README.txt` for the GFED data download.
+
+### Processed data
+Data is processed by the jupyter notebooks (saved as .py scripts using jupytext, under the `notebooks` folder).
+The output paths are generally specified at the beginning of each notebook.
+
+For instance, you find processed CEDS data at `\data\national\ceds\processed` and processed GFED data at `\data\national\gfed\processed`.
+
 ## Development
 
 <!--- In bigger projects, we would recommend having separate docs where this
