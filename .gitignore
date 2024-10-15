@@ -1,3 +1,10 @@
+# Processed data
+data/national/ceds/processed
+data/national/gfed/data_raw
+
+# CEDS data
+data/national/ceds/data_raw
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -11,6 +18,9 @@ __pycache__/
 
 # C extensions
 *.so
+
+# pixi stuff
+.pixi
 
 # Distribution / packaging
 .Python
